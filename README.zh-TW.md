@@ -22,9 +22,9 @@ Alpine.js 提供了 Vue 與 React 等大框架的互動式與宣告式的功能�
 就這樣。Alpine.js 會自行初始化。
 
 在正式環境中，建議在連結中固定特定版本，以避免新版本使功能無法使用。
-如，要使用 `2.8.1` 版則可以這樣寫：
+如，要使用 `2.8.2` 版則可以這樣寫：
 ```html
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
 ```
 
 **使用 npm:** 從 npm 安裝套件。
@@ -744,7 +744,7 @@ Alpine 仰賴與使用 `Function` 物件來自定實作以對指示詞取值。�
 
 ## 授權條款 License
 
-Copyright © 2019-2020 Caleb Porzio and contributors
+Copyright © 2019-2021 Caleb Porzio and contributors
 
 Licensed under the MIT license, see [LICENSE.md](LICENSE.md) for details.
 透過 MIT 授權條款授權，詳情請參閱 [LICENSE.md](LICENSE.md)。

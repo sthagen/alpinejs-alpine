@@ -14,7 +14,7 @@ DOM を保持し、適切な動作を施すことができます。
 
 **CDNより:** `<head>` セクションの最後に次のスクリプトを追加します。
 ```html
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.js" defer></script>
 ```
 
 それだけです。初期は自身で行われます。
@@ -546,6 +546,6 @@ Alpineでは `Function` オブジェクトを使用したカスタム実装に�
 
 ## ライセンス
 
-Copyright © 2019-2020 Caleb Porzio and contributors
+Copyright © 2019-2021 Caleb Porzio and contributors
 
 MIT ライセンスの下でライセンスされています。詳細については、[LICENSE.md](LICENSE.md) を参照してください。

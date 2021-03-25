@@ -23,10 +23,10 @@ Pensem nisso como o [Tailwind](https://tailwindcss.com/) para JavaScript.
 E é isso. Ele vai se inicializar.
 
 Para ambiente de produção, é recomendado fixar o número da versão específico no link para evitar problemas inesperadas das versões mais recentes.
-Por exemplo, para usar a versão `2.8.1`:
+Por exemplo, para usar a versão `2.8.2`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
 ```
 
 **Via npm:** Instale o pacote pelo npm.
@@ -784,6 +784,6 @@ Como uma política se aplica a todos os scripts da sua página, é importante qu
 
 ## Licença
 
-Copyright © 2019-2020 Caleb Porzio e colaboradores
+Copyright © 2019-2021 Caleb Porzio e colaboradores
 
 Licenciado sob a licença MIT, consulte [LICENSE.md](LICENSE.md) para obter detalhes.

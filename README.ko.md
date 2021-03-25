@@ -23,9 +23,9 @@ JavaScript용 [Tailwind](https://tailwindcss.com/)라고 생각하시면 됩니�
 그것으로 끝입니다. 자체적으로 초기화됩니다.
 
 프로덕션 환경의 경우 최신 버전의 예상치 못한 문제를 방지하기 위해 링크에 특정 버전 번호를 설정하는 것이 좋습니다.
-예를 들어 `2.8.1` 버전 사용:
+예를 들어 `2.8.2` 버전 사용:
 ```html
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
 ```
 
 **NPM 사용:** NPM에서 패키지를 설치합니다.
@@ -778,6 +778,6 @@ Alpine은 지시자을 평가하기 위해 `Function` 객체를 사용하는 사
 
 ## 라이센스
 
-저작권 © 2019-2020 Caleb Porzio 와 기여자들
+저작권 © 2019-2021 Caleb Porzio 와 기여자들
 
 MIT 라이센스에 따라 허가되며, 더 자세한 내용은 [LICENSE.md](LICENSE.md)를 확인하세요.

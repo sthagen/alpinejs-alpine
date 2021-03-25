@@ -21,9 +21,9 @@ Podríamos considerarlo como un [Tailwind](https://tailwindcss.com/) para JavaSc
 
 Eso es todo. Se inicializará solo.
 
-Para entornos de producción, se recomienda especificar una número de versión en concreto en el enlace para evitar comportamientos inesperados que puedan romper las nuevas versiones. Por ejemplo, para usar la versión `2.8.1` (la última):
+Para entornos de producción, se recomienda especificar una número de versión en concreto en el enlace para evitar comportamientos inesperados que puedan romper las nuevas versiones. Por ejemplo, para usar la versión `2.8.2` (la última):
 ```html
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.1/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
 ```
 
 **Desde npm:** Instalar el paquete desde npm.
@@ -747,6 +747,6 @@ Ya que la política se aplica a todos los scripts de tu página, es improtante q
 
 ## Licencia
 
-Copyright © 2019-2020 Caleb Porzio y colaboradores
+Copyright © 2019-2021 Caleb Porzio y colaboradores
 
 Licenciado bajo la licencia MIT, ve [LICENSE.md](LICENSE.md) para más detalles.

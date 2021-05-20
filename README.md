@@ -4,6 +4,15 @@
 ![npm version](https://img.shields.io/npm/v/alpinejs)
 [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg?sanitize=true)](https://alpinejs.codewithhugo.com/chat/)
 
+## Announcement: Alpine V3 Launching Soon!
+Alpine is getting a complete overhaul in almost every way. It's all dropping on Alpine Day, June 10th 2021.
+
+**[Go here for all the details!](https://alpineday.com)**
+
+![](https://alpineday.com/img/twitter_card.jpg)
+
+---
+
 Alpine.js offers you the reactive and declarative nature of big frameworks like Vue or React at a much lower cost.
 
 You get to keep your DOM, and sprinkle in behavior as you see fit.
@@ -27,6 +36,7 @@ Think of it like [Tailwind](https://tailwindcss.com/) for JavaScript.
 | Russian | [**Документация на русском**](./README.ru.md) |
 | Spanish | [**Documentación en Español**](./README.es.md) |
 | Turkish | [**Türkçe Dokümantasyon**](./README.tr.md) |
+| Farsi | [**مستندات به فارسی**](./README.fa.md) |
 | Français | [**Documentation en Français**](./README.fr.md) |
 | Korean | [**한국어 문서**](./README.ko.md) |
 
@@ -124,8 +134,8 @@ There are 14 directives available to you:
 | [`x-text`](#x-text) | Works similarly to `x-bind`, but will update the `innerText` of an element. |
 | [`x-html`](#x-html) | Works similarly to `x-bind`, but will update the `innerHTML` of an element. |
 | [`x-ref`](#x-ref) | Convenient way to retrieve raw DOM elements out of your component. |
-| [`x-if`](#x-if) | Remove an element completely from the DOM. Needs to be used on a `<template>` tag. |
-| [`x-for`](#x-for) | Create new DOM nodes for each item in an array. Needs to be used on a `<template>` tag. |
+| [`x-if`](#x-if) | Removes an element completely from the DOM. Needs to be used on a `<template>` tag. |
+| [`x-for`](#x-for) | Creates new DOM nodes for each item in an array. Needs to be used on a `<template>` tag. |
 | [`x-transition`](#x-transition) | Directives for applying classes to various stages of an element's transition. |
 | [`x-spread`](#x-spread) | Allows you to bind an object of Alpine directives to an element for better reusability. |
 | [`x-cloak`](#x-cloak) | This attribute is removed when Alpine initializes. Useful for hiding pre-initialized DOM. |
@@ -144,7 +154,8 @@ And 6 magic properties:
 
 ## Sponsors
 
-<img width="33%" src="https://refactoringui.nyc3.cdn.digitaloceanspaces.com/tailwind-logo.svg" alt="Tailwind CSS">
+[<img width="33%" src="https://refactoringui.nyc3.cdn.digitaloceanspaces.com/tailwind-logo.svg" alt="Tailwind CSS">](https://tailwindcss.com)
+
 
 **Want your logo here? [DM on Twitter](https://twitter.com/calebporzio)**
 

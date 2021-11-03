@@ -3,7 +3,7 @@ order: 4
 title: bind
 ---
 
-# `x-bind`
+# x-bind
 
 `x-bind` allows you to set HTML attributes on elements based on the result of JavaScript expressions.
 
@@ -122,6 +122,14 @@ Just like the class objects, this syntax is entirely optional. Only use it if it
 
 <!-- Will render: -->
 <div style="color: red; display: flex;" ...>
+```
+
+Conditional inline styling is possible using expressions just like with x-bind:class. Short circuit operators can be used here as well by using a styles object as the second operand.
+```alpine
+<div x-bind:style="true && { color: 'red' }">
+
+<!-- Will render: -->
+<div style="color: red;">
 ```
 
 One advantage of this approach is being able to mix it in with existing styles on an element:

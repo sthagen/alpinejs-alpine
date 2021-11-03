@@ -3,7 +3,7 @@ order: 5
 title: on
 ---
 
-# `x-on`
+# x-on
 
 `x-on` allows you to easily run code on dispatched DOM events.
 
@@ -12,6 +12,8 @@ Here's an example of simple button that shows an alert when clicked.
 ```alpine
 <button x-on:click="alert('Hello World!')">Say Hi</button>
 ```
+
+> `x-on` can only listen for events with lower case names, as HTML attribtes are case-insensitive. Writing `x-on:CLICK` will listen for an event named `click`. If you need to listen for a custom event with a camelCase name, you can use the [`.camel` helper](#camel) to work around this limitation. Alternatively, you can use  [`x-bind`](/directives/bind.md#bind-directives) to attach an `x-on` directive to an element in javascript code (where case will be preserved).
 
 <a name="shorthand-syntax"></a>
 ## Shorthand syntax
@@ -261,6 +263,19 @@ However, in this case, because we've added a `.self`, only clicking the button i
 Sometimes you may want to listen for camelCased events such as `customEvent` in our example. Because camelCasing inside HTML attributes is not supported, adding the `.camel` modifier is necessary for Alpine to camelCase the event name internally.
 
 By adding `.camel` in the above example, Alpine is now listening for `customEvent` instead of `custom-event`.
+
+<a name="dot"></a>
+### .dot
+
+```alpine
+<div @custom-event.dot="handleCustomEvent">
+    ...
+</div>
+```
+
+Similar to the `.camelCase` modifier there may be situations where you want to listen for events that have dots in their name (like `custom.event`). Since dots within the event name are reserved by Alpine you need to write them with dashes and add the `.dot` modifier.
+
+In the code example above `custom-event.dot` will correspond to the event name `custom.event`.
 
 <a name="passive"></a>
 ### .passive

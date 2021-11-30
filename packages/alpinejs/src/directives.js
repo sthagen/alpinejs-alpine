@@ -160,6 +160,7 @@ let directiveOrder = [
     'ignore',
     'ref',
     'data',
+    'id',
     'bind',
     'init',
     'for',
@@ -168,6 +169,8 @@ let directiveOrder = [
     'show',
     'if',
     DEFAULT,
+    'portal',
+    'portal-target',
     'element',
 ]
 

@@ -13,7 +13,7 @@ test('can morph components and preserve Alpine state',
         get('span').should(haveText('bar'))
         get('button').click()
         get('span').should(haveText('baz'))
-        
+
         get('div').then(([el]) => window.Alpine.morph(el, toHtml))
 
         get('span').should(haveText('baz'))
@@ -35,7 +35,7 @@ test('morphing target uses outer Alpine scope',
         get('span').should(haveText('bar'))
         get('button').click()
         get('span').should(haveText('baz'))
-        
+
         get('div').then(([el]) => window.Alpine.morph(el, toHtml))
 
         get('span').should(haveText('baz'))
@@ -58,7 +58,7 @@ test('can morph with HTML change and preserve Alpine state',
         get('button').should(haveText('Change Foo'))
 
         get('div').then(([el]) => window.Alpine.morph(el, toHtml))
-        
+
         get('span').should(haveText('baz'))
         get('button').should(haveText('Changed Foo'))
     },
@@ -87,18 +87,18 @@ test('morphing an element with multiple nested Alpine components preserves scope
         get('h1').should(haveText('law'))
 
         get('div').then(([el]) => window.Alpine.morph(el, toHtml))
-        
+
         get('span').should(haveText('baz'))
         get('h1').should(haveText('law'))
     },
 )
 
-test('can morph portals',
+test('can morph teleports',
     [html`
         <div x-data="{ count: 1 }" id="a">
             <button @click="count++">Inc</button>
 
-            <template x-portal="foo">
+            <template x-teleport="#b">
                 <div>
                     <h1 x-text="count"></h1>
                     <h2>hey</h2>
@@ -106,16 +106,14 @@ test('can morph portals',
             </template>
         </div>
 
-        <div id="b">
-            <template x-portal-target="foo"></template>
-        </div>
+        <div id="b"></div>
     `],
     ({ get }, reload, window, document) => {
         let toHtml = html`
         <div x-data="{ count: 1 }" id="a">
             <button @click="count++">Inc</button>
 
-            <template x-portal="foo">
+            <template x-teleport="#b">
                 <div>
                     <h1 x-text="count"></h1>
                     <h2>there</h2>
@@ -128,7 +126,7 @@ test('can morph portals',
         get('button').click()
         get('h1').should(haveText('2'))
         get('h2').should(haveText('hey'))
-        
+
         get('div#a').then(([el]) => window.Alpine.morph(el, toHtml))
 
         get('h1').should(haveText('2'))

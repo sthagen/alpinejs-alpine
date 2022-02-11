@@ -78,16 +78,18 @@ For example, in the following snippet, `shown` will remain `false` until the ele
 <a name="x-intersect-enter"></a>
 ### x-intersect:enter
 
-You can opt to only trigger x-intersect when the element ENTERS the viewport by adding the `:enter` suffix to `x-intersect` like so:
+The `:enter` suffix is an alias of `x-intersect`, and works the same way:
 
 ```alpine
 <div x-intersect:enter="shown = true">...</div>
 ```
 
+You may choose to use this for clarity when also using the `:leave` suffix.
+
 <a name="x-intersect-leave"></a>
 ### x-intersect:leave
 
-Similarly, you can add `:leave` to only trigger x-intersect when the element LEAVES the viewport:
+Appending `:leave` runs your expression when the element leaves the viewport:
 
 ```alpine
 <div x-intersect:leave="shown = true">...</div>
@@ -125,4 +127,26 @@ Useful for elements where it's important to show the whole element.
 
 ```alpine
 <div x-intersect.full="shown = true">...</div> // when `0.99` of the element is in the viewport
+```
+
+<a name="margin"></a>
+### .margin
+
+Allows you to control the `rootMargin` property of the underlying `IntersectionObserver`.
+This effectively tweaks the size of the viewport boundary. Positive values
+expand the boundary beyond the viewport, and negative values shrink it inward. The values
+work like CSS margin: one value for all sides, two values for top/bottom, left/right, or
+four values for top, right, bottom, left. You can use `px` and `%` values, or use a bare number to
+get a pixel value.
+
+```alpine
+<div x-intersect.margin.200px="loaded = true">...</div> // Load when the element is within 200px of the viewport
+```
+
+```alpine
+<div x-intersect:leave.margin.10%.25px.25.25px="loaded = false">...</div> // Unload when the element gets within 10% of the top of the viewport, or within 25px of the other three edges
+```
+
+```alpine
+<div x-intersect.margin.-100px="visible = true">...</div> // Mark as visible when element is more than 100 pixels into the viewport.
 ```

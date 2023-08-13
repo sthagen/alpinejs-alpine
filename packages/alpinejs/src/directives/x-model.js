@@ -70,8 +70,10 @@ directive('model', (el, { modifiers, expression }, { effect, cleanup }) => {
         setValue(getInputValue(el, modifiers, e, getValue()))
     })
     
-    if (modifiers.includes('fill') && [null, ''].includes(getValue())) {
-        el.dispatchEvent(new Event(event, {}));
+    if (modifiers.includes('fill'))
+        if ([null, ''].includes(getValue())
+            || (el.type === 'checkbox' && Array.isArray(getValue()))) {
+            el.dispatchEvent(new Event(event, {}));
     }
     // Register the listener removal callback on the element, so that
     // in addition to the cleanup function, x-modelable may call it.
@@ -104,8 +106,6 @@ directive('model', (el, { modifiers, expression }, { effect, cleanup }) => {
     }
 
     el._x_forceModelUpdate = (value) => {
-        value = value === undefined ? getValue() : value
-
         // If nested model key is undefined, set the default value to empty string.
         if (value === undefined && typeof expression === 'string' && expression.match(/\./)) value = ''
 

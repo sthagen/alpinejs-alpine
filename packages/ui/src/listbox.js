@@ -100,7 +100,7 @@ function handleRoot(el, Alpine) {
                     this.__compareBy = Alpine.extractProp(el, 'by')
                     this.__orientation = Alpine.extractProp(el, 'horizontal', false) ? 'horizontal' : 'vertical'
 
-                    this.__context = generateContext(this.__isMultiple, this.__orientation, () => this.$data.__activateSelectedOrFirst())
+                    this.__context = generateContext(Alpine, this.__isMultiple, this.__orientation, () => this.$data.__activateSelectedOrFirst())
 
                     let defaultValue = Alpine.extractProp(el, 'default-value', this.__isMultiple ? [] : null)
 
@@ -113,7 +113,7 @@ function handleRoot(el, Alpine) {
                         Alpine.effect(() => {
                             // Everytime the value changes, we need to re-render the hidden inputs,
                             // if a user passed the "name" prop...
-                            this.__inputName && renderHiddenInputs(this.$el, this.__inputName, this.__value)
+                            this.__inputName && renderHiddenInputs(Alpine, this.$el, this.__inputName, this.__value)
                         })
 
                         // Keep the currently selected value in sync with the input value...

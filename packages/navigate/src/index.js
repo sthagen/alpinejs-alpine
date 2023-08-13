@@ -1,36 +1,62 @@
-import { transition } from "alpinejs/src/directives/x-transition"
-import { finishAndHideProgressBar, showAndStartProgressBar } from "./bar"
-import { fetchHtml } from "./fetch"
 import { updateCurrentPageHtmlInHistoryStateForLaterBackButtonClicks, updateUrlAndStoreLatestHtmlForFutureBackButtons, whenTheBackOrForwardButtonIsClicked } from "./history"
-import { extractDestinationFromLink, hijackNewLinksOnThePage, whenALinkIsClicked, whenALinkIsHovered } from "./links"
-import { swapCurrentPageWithNewHtml } from "./page"
-import { putPersistantElementsBack, storePersistantElementsForLater } from "./persist"
 import { getPretchedHtmlOr, prefetchHtml, storeThePrefetchedHtmlForWhenALinkIsClicked } from "./prefetch"
+import { createUrlObjectFromString, extractDestinationFromLink, whenThisLinkIsHoveredFor, whenThisLinkIsPressed } from "./links"
 import { restoreScrollPosition, storeScrollInformationInHtmlBeforeNavigatingAway } from "./scroll"
+import { putPersistantElementsBack, storePersistantElementsForLater } from "./persist"
+import { finishAndHideProgressBar, showAndStartProgressBar } from "./bar"
+import { transition } from "alpinejs/src/directives/x-transition"
+import { swapCurrentPageWithNewHtml } from "./page"
+import { fetchHtml } from "./fetch"
+import { prefix } from "alpinejs/src/directives"
 
-let enablePrefetch = true
 let enablePersist = true
 let showProgressBar = true
 let restoreScroll = true
 let autofocus = false
 
 export default function (Alpine) {
-    updateCurrentPageHtmlInHistoryStateForLaterBackButtonClicks()
+    Alpine.navigate = (url) => {
+        navigateTo(
+            createUrlObjectFromString(url)
+        )
+    }
 
-    enablePrefetch && whenALinkIsHovered((el) => {
-        let forDestination = extractDestinationFromLink(el)
+    Alpine.navigate.disableProgressBar = () => {
+        showProgressBar = false
+    }
 
-        prefetchHtml(forDestination, html => {
-            storeThePrefetchedHtmlForWhenALinkIsClicked(html, forDestination)
+    Alpine.addInitSelector(() => `[${prefix('navigate')}]`)
+
+    Alpine.directive('navigate', (el, { value, expression, modifiers }, { evaluateLater, cleanup }) => {
+        let shouldPrefetchOnHover = modifiers.includes('hover')
+
+        shouldPrefetchOnHover && whenThisLinkIsHoveredFor(el, 60, () => {
+            let destination = extractDestinationFromLink(el)
+
+            prefetchHtml(destination, html => {
+                storeThePrefetchedHtmlForWhenALinkIsClicked(html, destination)
+            })
+        })
+
+        whenThisLinkIsPressed(el, (whenItIsReleased) => {
+            let destination = extractDestinationFromLink(el)
+
+            prefetchHtml(destination, html => {
+                storeThePrefetchedHtmlForWhenALinkIsClicked(html, destination)
+            })
+
+            whenItIsReleased(() => {
+                navigateTo(destination)
+            })
         })
     })
 
-    whenALinkIsClicked((el) => {
+    function navigateTo(destination) {
         showProgressBar && showAndStartProgressBar()
 
-        let fromDestination = extractDestinationFromLink(el)
+        fetchHtmlOrUsePrefetchedHtml(destination, html => {
+            fireEventForOtherLibariesToHookInto('alpine:navigating')
 
-        fetchHtmlOrUsePrefetchedHtml(fromDestination, html => {
             restoreScroll && storeScrollInformationInHtmlBeforeNavigatingAway()
 
             showProgressBar && finishAndHideProgressBar()
@@ -43,15 +69,11 @@ export default function (Alpine) {
                 swapCurrentPageWithNewHtml(html, () => {
                     enablePersist && putPersistantElementsBack()
 
-                    // Added setTimeout here to detect a currently hovered prefetch link...
-                    // (hack for laracon)
-                    setTimeout(() => hijackNewLinksOnThePage())
-
                     restoreScroll && restoreScrollPosition()
 
-                    fireEventForOtherLibariesToHookInto()
+                    fireEventForOtherLibariesToHookInto('alpine:navigated')
 
-                    updateUrlAndStoreLatestHtmlForFutureBackButtons(html, fromDestination)
+                    updateUrlAndStoreLatestHtmlForFutureBackButtons(html, destination)
 
                     andAfterAllThis(() => {
                         autofocus && autofocusElementsWithTheAutofocusAttribute()
@@ -59,10 +81,9 @@ export default function (Alpine) {
                         nowInitializeAlpineOnTheNewPage(Alpine)
                     })
                 })
-
             })
         })
-    })
+    }
 
     whenTheBackOrForwardButtonIsClicked((html) => {
         // @todo: see if there's a way to update the current HTML BEFORE
@@ -76,11 +97,9 @@ export default function (Alpine) {
             swapCurrentPageWithNewHtml(html, andThen => {
                 enablePersist && putPersistantElementsBack()
 
-                hijackNewLinksOnThePage()
-
                 restoreScroll && restoreScrollPosition()
 
-                fireEventForOtherLibariesToHookInto()
+                fireEventForOtherLibariesToHookInto('alpine:navigated')
 
                 andAfterAllThis(() => {
                     autofocus && autofocusElementsWithTheAutofocusAttribute()
@@ -90,6 +109,12 @@ export default function (Alpine) {
             })
 
         })
+    })
+
+    // Because DOMContentLoaded is fired on first load,
+    // we should fire alpine:navigated as a replacement as well...
+    setTimeout(() => {
+        fireEventForOtherLibariesToHookInto('alpine:navigated', true)
     })
 }
 
@@ -111,8 +136,8 @@ function preventAlpineFromPickingUpDomChanges(Alpine, callback) {
     })
 }
 
-function fireEventForOtherLibariesToHookInto() {
-    document.dispatchEvent(new CustomEvent('alpine:navigated', { bubbles: true }))
+function fireEventForOtherLibariesToHookInto(eventName, init = false) {
+    document.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail: { init } }))
 }
 
 function nowInitializeAlpineOnTheNewPage(Alpine) {

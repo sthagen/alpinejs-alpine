@@ -1,5 +1,5 @@
 
-export function generateContext(multiple, orientation, activateSelectedOrFirst) {
+export function generateContext(Alpine, multiple, orientation, activateSelectedOrFirst) {
     return {
         /**
          * Main state...
@@ -325,7 +325,7 @@ function keyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value)
 }
 
-export function renderHiddenInputs(el, name, value) {
+export function renderHiddenInputs(Alpine, el, name, value) {
     // Create input elements...
     let newInputs = generateInputs(name, value)
 

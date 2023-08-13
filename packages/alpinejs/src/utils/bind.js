@@ -57,7 +57,7 @@ function bindInputValue(el, value) {
         // automatically.
         if (Number.isInteger(value)) {
             el.value = value
-        } else if (! Number.isInteger(value) && ! Array.isArray(value) && typeof value !== 'boolean' && ! [null, undefined].includes(value)) {
+        } else if (! Array.isArray(value) && typeof value !== 'boolean' && ! [null, undefined].includes(value)) {
             el.value = String(value)
         } else {
             if (Array.isArray(value)) {
@@ -71,7 +71,7 @@ function bindInputValue(el, value) {
     } else {
         if (el.value === value) return
 
-        el.value = value
+        el.value = value === undefined ? '' : value
     }
 }
 

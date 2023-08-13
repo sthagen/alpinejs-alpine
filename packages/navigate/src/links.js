@@ -1,51 +1,54 @@
 
-let handleLinkClick = () => {}
-let handleLinkHover = () => {}
+export function whenThisLinkIsClicked(el, callback) {
+    el.addEventListener('click', e => {
+        e.preventDefault()
 
-export function whenALinkIsClicked(callback) {
-    handleLinkClick = callback
-
-    initializeLinksForClicking()
+        callback(el)
+    })
 }
 
-export function whenALinkIsHovered(callback) {
-    handleLinkHover = callback
+export function whenThisLinkIsPressed(el, callback) {
+    el.addEventListener('click', e => e.preventDefault())
 
-    initializeLinksForHovering()
-}
+    el.addEventListener('mousedown', e => {
+        if (e.button !== 0) return; // Only on left click...
 
-export function extractDestinationFromLink(linkEl) {
-    return new URL(linkEl.getAttribute('href'), document.baseURI)
-}
+        e.preventDefault()
 
-export function hijackNewLinksOnThePage() {
-    initializeLinksForClicking()
-    initializeLinksForHovering()
-}
+        callback((whenReleased) => {
+            let handler = e => {
+                e.preventDefault()
 
-function initializeLinksForClicking() {
-    getLinks().forEach(el => {
-        el.addEventListener('click', e => {
-            e.preventDefault()
+                whenReleased()
 
-            handleLinkClick(el)
+                el.removeEventListener('mouseup', handler)
+            }
+
+            el.addEventListener('mouseup', handler)
         })
     })
 }
 
-function initializeLinksForHovering() {
-    getLinks()
-        .filter(i => i.hasAttribute('wire:navigate.prefetch'))
-        .forEach(el => {
-            el.addEventListener('mouseenter', e => {
-                handleLinkHover(el)
-            })
-        })
+export function whenThisLinkIsHoveredFor(el, ms = 60, callback) {
+    el.addEventListener('mouseenter', e => {
+        let timeout = setTimeout(() => {
+
+        }, ms)
+
+        let handler = () => {
+            clear
+            el.removeEventListener('mouseleave', handler)
+        }
+
+        el.addEventListener('mouseleave', handler)
+        callback(e)
+    })
 }
 
-function getLinks() {
-    return Array.from(document.links)
-        .filter(i => i.hasAttribute('wire:navigate')
-        || i.hasAttribute('wire:navigate.prefetch'))
+export function extractDestinationFromLink(linkEl) {
+    return createUrlObjectFromString(linkEl.getAttribute('href'))
 }
 
+export function createUrlObjectFromString(urlString) {
+    return new URL(urlString, document.baseURI)
+}

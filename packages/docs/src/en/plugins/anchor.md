@@ -76,7 +76,7 @@ For example, here's a simple dropdown anchored to the button that toggles it:
         <button x-ref="button" @click="open = ! open">Toggle</button>
     </div>
 
-    <div x-show="open" x-anchor="$refs.button" class="bg-white rounded p-4 border shadow">
+    <div x-show="open" x-anchor="$refs.button" class="bg-white rounded p-4 border shadow z-10">
         Dropdown content
     </div>
 </div>
@@ -110,7 +110,7 @@ Here is an example of using `.bottom-start` to position a dropdown below and to 
         <button x-ref="button" @click="open = ! open">Toggle</button>
     </div>
 
-    <div x-show="open" x-anchor.bottom-start="$refs.button" class="bg-white rounded p-4 border shadow">
+    <div x-show="open" x-anchor.bottom-start="$refs.button" class="bg-white rounded p-4 border shadow z-10">
         Dropdown content
     </div>
 </div>
@@ -137,7 +137,7 @@ You can add an offset to your anchored element using the `.offset.[px value]` mo
         <button x-ref="button" @click="open = ! open">Toggle</button>
     </div>
 
-    <div x-show="open" x-anchor.offset.10="$refs.button" class="bg-white rounded p-4 border shadow">
+    <div x-show="open" x-anchor.offset.10="$refs.button" class="bg-white rounded p-4 border shadow z-10">
         Dropdown content
     </div>
 </div>
@@ -146,7 +146,7 @@ You can add an offset to your anchored element using the `.offset.[px value]` mo
 <a name="manual-styling"></a>
 ## Manual styling
 
-By default, `x-alpine` applies the positioning styles to your element under the hood. If you'd prefer full control over styling, you can pass the `.no-style` modifer and use the `$anchor` magic to access the values inside another Alpine expression.
+By default, `x-anchor` applies the positioning styles to your element under the hood. If you'd prefer full control over styling, you can pass the `.no-style` modifer and use the `$anchor` magic to access the values inside another Alpine expression.
 
 Below is an example of bypassing `x-anchor`'s internal styling and instead applying the styles yourself using `x-bind:style`:
 
@@ -174,7 +174,7 @@ Below is an example of bypassing `x-anchor`'s internal styling and instead apply
         x-show="open"
         x-anchor.no-style="$refs.button"
         x-bind:style="{ position: 'absolute', top: $anchor.y+'px', left: $anchor.x+'px' }"
-        class="bg-white rounded p-4 border shadow"
+        class="bg-white rounded p-4 border shadow z-10"
     >
         Dropdown content
     </div>

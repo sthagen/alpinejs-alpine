@@ -50,7 +50,7 @@ export default function (Alpine) {
 
         let optionEl = Alpine.findClosest(el, i => i.__optionKey)
 
-        if (! optionEl) throw 'No x-combobox:option directive found...'
+        if (! optionEl) throw 'No x-listbox:option directive found...'
 
         return {
             get isActive() {
@@ -226,7 +226,14 @@ function handleRoot(el, Alpine) {
 
                     if (typeof by === 'string') {
                         let property = by
-                        by = (a, b) => a[property] === b[property]
+                        by = (a, b) => {
+                            // Handle null values
+                            if ((! a || typeof a !== 'object') || (! b || typeof b !== 'object')) {
+                                return Alpine.raw(a) === Alpine.raw(b)
+                            }
+
+                            return a[property] === b[property];
+                        }
                     }
 
                     return by(a, b)

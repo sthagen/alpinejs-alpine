@@ -111,6 +111,9 @@ function handleRoot(el, Alpine) {
                             // if a user passed the "name" prop...
                             this.__inputName && renderHiddenInputs(Alpine, this.$el, this.__inputName, this.__value)
                         })
+
+                        // Set initial combobox values in the input and properly clear it when the value is reset programmatically...
+                        Alpine.effect(() => ! this.__isMultiple && this.__resetInput())
                     })
                 },
                 __startTyping() {

@@ -134,6 +134,51 @@ test('can morph teleports',
     },
 )
 
+test('can morph teleports in different places with IDs',
+    [html`
+        <div x-data="{ count: 1 }" id="a">
+            <button @click="count++">Inc</button>
+
+            <template x-teleport="#b" id="template">
+                <div>
+                    <h1 x-text="count"></h1>
+                    <h2>hey</h2>
+                </div>
+            </template>
+
+            <div>moving placeholder</div>
+        </div>
+
+        <div id="b"></div>
+    `],
+    ({ get }, reload, window, document) => {
+        let toHtml = html`
+        <div x-data="{ count: 1 }" id="a">
+            <button @click="count++">Inc</button>
+
+            <div>moving placeholder</div>
+
+            <template x-teleport="#b" id="template">
+                <div>
+                    <h1 x-text="count"></h1>
+                    <h2>there</h2>
+                </div>
+            </template>
+        </div>
+        `
+        get('h1').should(haveText('1'))
+        get('h2').should(haveText('hey'))
+        get('button').click()
+        get('h1').should(haveText('2'))
+        get('h2').should(haveText('hey'))
+
+        get('div#a').then(([el]) => window.Alpine.morph(el, toHtml))
+
+        get('h1').should(haveText('2'))
+        get('h2').should(haveText('there'))
+    },
+)
+
 test('can morph',
     [html`
         <ul>
@@ -535,5 +580,75 @@ test('can morph menu',
         }))
 
         get('input').should(haveValue('foo'))
+    },
+)
+
+test('can morph teleports with x-for',
+    [html`
+    <main x-data>
+        <template x-teleport="body">
+            <article>
+                <template x-for="item in 3" :key="item">
+                    <span x-text="item"></span>
+                </template>
+            </article>
+        </template>
+
+        <button x-data="{ count: 1 }" x-text="count" x-on:click="count++" type="button"></button>
+    </main>
+    `],
+    ({ get }, reload, window, document) => {
+        let toHtml = html`
+        <main x-data>
+            <template x-teleport="body">
+                <article>
+                    <template x-for="item in 3" :key="item">
+                        <span x-text="item"></span>
+                    </template>
+                </article>
+            </template>
+
+            <button x-data="{ count: 1 }" x-text="count" x-on:click="count++" type="button"></button>
+        </main>
+        `
+
+        get('button').should(haveText('1'));
+        get('button').click()
+        get('button').should(haveText('2'));
+
+        get('main').then(([el]) => window.Alpine.morph(el, toHtml));
+
+        get('button').should(haveText('2'));
+        get('button').click()
+        get('button').should(haveText('3'));
+    },
+)
+
+test('can morph teleports with root-level state',
+    [html`
+    <main x-data>
+        <template x-teleport="body">
+            <div x-data="{ foo: 'bar' }">
+                <h1 x-text="foo"></h1>
+            </div>
+        </template>
+    </main>
+    `],
+    ({ get }, reload, window, document) => {
+        let toHtml = html`
+        <main x-data>
+            <template x-teleport="body">
+                <div x-data="{ foo: 'bar' }">
+                    <h1 x-text="foo"></h1>
+                </div>
+            </template>
+        </main>
+        `
+
+        get('h1').should(haveText('bar'));
+
+        get('main').then(([el]) => window.Alpine.morph(el, toHtml));
+
+        get('h1').should(haveText('bar'));
     },
 )

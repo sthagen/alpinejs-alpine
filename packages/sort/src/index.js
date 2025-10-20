@@ -91,7 +91,19 @@ function initSortable(el, config, preferences, handle) {
 
         group: preferences.group,
 
+        scroll: true,
+
+        forceAutoScrollFallback: true,
+
+        scrollSensitivity: 50,
+
+        // This is here so that if a div containing inputs or buttons has x-sort:ignore, it will not prevent interaction...
+        preventOnFilter: false,
+
         filter(e) {
+            if (e.target.hasAttribute('x-sort:ignore') || e.target.hasAttribute('wire:sort:ignore')) return true
+            if (e.target.closest('[x-sort\\:ignore]') || e.target.closest('[wire\\:sort\\:ignore]')) return true
+
             // Normally, we would just filter out any elements without `[x-sort:item]`
             // on them, however for backwards compatibility (when we didn't require
             // `[x-sort:item]`) we will check for x-sort\\:item being used at all

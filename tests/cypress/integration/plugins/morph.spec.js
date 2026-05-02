@@ -134,6 +134,41 @@ test('can morph teleports',
     },
 )
 
+test('morphing teleports does not leak detached teleport clones',
+    [html`
+        <div x-data="{ count: 1 }" id="a">
+            <button @click="count++">Inc</button>
+
+            <template x-teleport="#b">
+                <div>
+                    <h1 x-text="count"></h1>
+                </div>
+            </template>
+        </div>
+
+        <div id="b"></div>
+    `],
+    ({ get }, reload, window, document) => {
+        let toHtml = document.querySelector('div#a').outerHTML
+
+        get('div#a').then(([el]) => {
+            for (let i = 0; i < 5; i++) {
+                window.Alpine.morph(el, toHtml)
+            }
+        })
+
+        get('template[data-teleport-template]').then(([template]) => {
+            let probe = template.cloneNode(true)
+            window.Alpine.cloneNode(template, probe)
+
+            let container = probe._x_teleport.parentElement
+            let siblings = container ? container.children.length : 1
+
+            cy.wrap(siblings).should('equal', 1)
+        })
+    },
+)
+
 test('can morph teleports in different places with IDs',
     [html`
         <div x-data="{ count: 1 }" id="a">
@@ -1130,6 +1165,107 @@ test('can morph child element containing x-ref without crashing',
         // Verify $refs still resolves after morph
         get('button').click()
         get('input').should(haveFocus())
+    },
+)
+
+test('morph with x-if does not duplicate content when data changes before morph',
+    [html`
+        <div x-data>
+            <div id="root">
+                <template x-if="$store.test.show">
+                    <p>Hello world!</p>
+                </template>
+
+                <button>Open</button>
+            </div>
+        </div>
+    `,
+    `
+        Alpine.store('test', { show: false })
+    `],
+    ({ get }, reload, window, document) => {
+        get('p').should('not.exist')
+
+        get('#root').then(async ([el]) => {
+            let toHtml = el.outerHTML
+
+            await window.Alpine.transaction(async () => {
+                window.Alpine.store('test').show = true
+
+                window.Alpine.morph(el, toHtml)
+            })
+
+            // Wait for deferred effects to flush (they're scheduled as a microtask after the transaction commits)...
+            await new Promise(queueMicrotask)
+
+            expect(el.querySelectorAll('p').length).to.equal(1)
+        })
+    },
+)
+
+test('morph with x-for does not duplicate items when data changes before morph',
+    [html`
+        <div x-data>
+            <div id="root">
+                <template x-for="item in $store.test.items" :key="item">
+                    <p x-text="item"></p>
+                </template>
+
+                <button>Load</button>
+            </div>
+        </div>
+    `,
+    `
+        Alpine.store('test', { items: [] })
+    `],
+    ({ get }, reload, window, document) => {
+        get('p').should('not.exist')
+
+        get('#root').then(async ([el]) => {
+            let toHtml = el.outerHTML
+
+            await window.Alpine.transaction(async () => {
+                window.Alpine.store('test').items = ['Apple', 'Banana', 'Cherry']
+
+                window.Alpine.morph(el, toHtml)
+            })
+
+            // Wait for deferred effects to flush (they're scheduled as a microtask after the transaction commits)...
+            await new Promise(queueMicrotask)
+
+            expect(el.querySelectorAll('p').length).to.equal(3)
+        })
+    },
+)
+
+test('morph preserves x-if content and nested Alpine state across morph',
+    [html`
+        <div x-data id="root">
+            <div x-data="{ showCounter: false }">
+                <button @click="showCounter = true" id="show-btn">show</button>
+
+                <template x-if="showCounter">
+                    <div x-data="{ count: 0 }">
+                        <button @click="count++" id="inc-btn">+</button>
+                        <span x-text="count" id="count"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    `],
+    ({ get }, reload, window, document) => {
+        let toHtml = document.querySelector('#root').outerHTML
+
+        get('#count').should('not.exist')
+        get('#show-btn').click()
+        get('#count').should(haveText('0'))
+        get('#inc-btn').click()
+        get('#count').should(haveText('1'))
+
+        get('#root').then(([el]) => window.Alpine.morph(el, toHtml))
+
+        get('#count').should('be.visible')
+        get('#count').should(haveText('1'))
     },
 )
 

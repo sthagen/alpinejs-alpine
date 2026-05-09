@@ -63,6 +63,8 @@ function bindInputValue(el, value) {
         }
     } else if (el.tagName === 'SELECT') {
         updateSelect(el, value)
+    } else if (el.tagName === 'OPTION') {
+        bindAttribute(el, 'value', value)
     } else {
         if (el.value === value) return
 

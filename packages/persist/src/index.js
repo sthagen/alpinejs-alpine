@@ -12,12 +12,12 @@ export default function (Alpine) {
             let dummy = new Map();
 
             storage = {
-                getItem: dummy.get.bind(dummy),
+                getItem: key => dummy.has(key) ? dummy.get(key) : null,
                 setItem: dummy.set.bind(dummy)
             }
         }
 
-        return Alpine.interceptor((initialValue, getter, setter, path, key) => {
+        return Alpine.interceptor((initialValue, getter, setter, path, key, cleanup = () => {}) => {
             let lookup = alias || `_x_${path}`
 
             let initial = storageHas(lookup, storage)
@@ -26,13 +26,15 @@ export default function (Alpine) {
 
             setter(initial)
 
-            Alpine.effect(() => {
+            let effect = Alpine.effect(() => {
                 let value = getter()
 
                 storageSet(lookup, value, storage)
 
                 setter(value)
             })
+
+            cleanup(() => Alpine.release(effect))
 
             return initial
         }, func => {
@@ -61,7 +63,9 @@ export default function (Alpine) {
 }
 
 function storageHas(key, storage) {
-    return storage.getItem(key) !== null
+    let value = storage.getItem(key)
+
+    return value !== null && value !== undefined
 }
 
 function storageGet(key, storage) {
@@ -73,5 +77,15 @@ function storageGet(key, storage) {
 }
 
 function storageSet(key, value, storage) {
+    // Avoid persisting "undefined" values. JSON.stringify(undefined) returns
+    // undefined, which the storage API coerces into the string "undefined".
+    // On the next page load, JSON.parse("undefined") would throw and break
+    // the component that initialized that persisted value.
+    if (value === undefined) {
+        storage.removeItem?.(key)
+
+        return
+    }
+
     storage.setItem(key, JSON.stringify(value))
 }

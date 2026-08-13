@@ -91,6 +91,52 @@ test('can persist boolean',
     },
 )
 
+test('does not persist undefined values',
+    [html`
+        <div x-data="{ foo: $persist('bar').as('no-undefined') }">
+            <button @click="foo = undefined"></button>
+            <span x-text="foo === undefined ? 'undefined' : foo"></span>
+        </div>
+    `],
+    ({ get, window }, reload) => {
+        get('span').should(haveText('bar'))
+        get('button').click()
+        get('span').should(haveText('undefined'))
+        window().then((win) => {
+            expect(win.localStorage.getItem('no-undefined')).to.equal(null)
+        })
+        reload()
+        get('span').should(haveText('bar'))
+    },
+)
+
+test('does not write undefined values to custom storage without removeItem',
+    [html`
+        <div x-data="{ foo: $persist('bar').as('custom-undefined').using(window.customStorage) }">
+            <button @click="foo = undefined"></button>
+            <span x-text="foo === undefined ? 'undefined' : foo"></span>
+        </div>
+    `, `
+        window.customStorage = {
+            values: {},
+            writes: {},
+            getItem(key) { return this.values[key] ?? null },
+            setItem(key, value) { this.values[key] = value; this.writes[key] = (this.writes[key] || 0) + 1 },
+        }
+    `],
+    ({ get, window }) => {
+        get('span').should(haveText('bar'))
+        window().then((win) => {
+            win.customStorage.writes['custom-undefined'] = 0
+        })
+        get('button').click()
+        get('span').should(haveText('undefined'))
+        window().then((win) => {
+            expect(win.customStorage.writes['custom-undefined']).to.equal(0)
+        })
+    },
+)
+
 test('can persist multiple components using the same property',
     [html`
         <div x-data="{ duplicate: $persist('foo') }">
@@ -227,6 +273,25 @@ test('can persist using global Alpine.$persist within Alpine.store',
     },
 )
 
+test('can persist a primitive as a direct Alpine store',
+    [html`
+        <div x-data>
+            <button @click="$store.language = $store.language === 'EN' ? 'IT' : 'EN'"></button>
+            <span x-text="$store.language"></span>
+        </div>
+    `, `
+        Alpine.store('language', Alpine.$persist('EN').as('direct-store-language'))
+    `],
+    ({ get, window }, reload) => {
+        get('span').should(haveText('EN'))
+        get('button').click()
+        get('span').should(haveText('IT'))
+        window().its('localStorage.direct-store-language').should(beEqualTo(JSON.stringify('IT')))
+        reload()
+        get('span').should(haveText('IT'))
+    },
+)
+
 test('persist in Stores is available in init call',
     [html`
         <div x-data>
@@ -269,5 +334,118 @@ test('multiple aliases work when using global Alpine.$persist',
         reload()
         get('span').should(haveText('Joe'))
         get('p').should(haveText('Doe'))
+    },
+)
+
+test('x-data replacement initializes new persisted properties',
+    [html`
+        <div id="component" x-data="{
+            count: $persist(1).as('count').using(window.persistStorage),
+        }">
+            <span x-text="count"></span>
+        </div>
+    `, `
+        window.persistStorage = {
+            values: {},
+            getItem(key) { return this.values[key] ?? null },
+            setItem(key, value) { this.values[key] = value },
+        }
+    `],
+    ({ get }, reload, window) => {
+        get('#component').then(([el]) => {
+            window.Alpine.$data(el).count = 2
+        })
+
+        get('span').should(haveText('2'))
+
+        get('#component').then(([el]) => {
+            el.setAttribute('x-data', `{
+                count: $persist(0).as('count').using(window.persistStorage),
+                message: $persist('hello').as('message').using(window.persistStorage),
+            }`)
+        })
+
+        get('#component').should(([el]) => {
+            let data = window.Alpine.$data(el)
+
+            expect(data.count).to.equal(2)
+            expect(data.message).to.equal('hello')
+        })
+
+        get('#component').then(([el]) => {
+            let data = window.Alpine.$data(el)
+
+            data.count = 3
+            data.message = 'goodbye'
+        })
+
+        get('#component').should(() => {
+            expect(window.persistStorage.values.count).to.equal(JSON.stringify(3))
+            expect(window.persistStorage.values.message).to.equal(JSON.stringify('goodbye'))
+        })
+    },
+)
+
+test('x-data replacement releases previous persistence effects',
+    [html`
+        <div id="component" x-data="{
+            count: $persist(1).as('count').using(window.persistStorage),
+        }">
+            <span x-text="count"></span>
+        </div>
+    `, `
+        window.persistStorage = {
+            values: {},
+            writes: {},
+            getItem(key) { return this.values[key] ?? null },
+            setItem(key, value) {
+                this.values[key] = value
+                this.writes[key] = (this.writes[key] || 0) + 1
+            },
+        }
+    `],
+    ({ get }, reload, window) => {
+        let replacePersistedCount = version => {
+            get('#component').then(([el]) => {
+                el.setAttribute('x-data', `{
+                    version: ${version},
+                    count: $persist(${version}).as('count').using(window.persistStorage),
+                }`)
+            })
+
+            get('#component').should(([el]) => {
+                expect(window.Alpine.$data(el).version).to.equal(version)
+            })
+        }
+
+        replacePersistedCount(2)
+        replacePersistedCount(3)
+
+        get('#component').then(([el]) => {
+            window.persistStorage.writes.count = 0
+            window.Alpine.$data(el).count = 4
+        })
+
+        get('#component').should(() => {
+            expect(window.persistStorage.writes.count).to.equal(1)
+        })
+
+        get('#component').then(([el]) => {
+            el.setAttribute('x-data', '{ count: 5 }')
+        })
+
+        get('#component').should(([el]) => {
+            expect(window.Alpine.$data(el).count).to.equal(5)
+        })
+
+        get('#component').then(([el]) => {
+            window.persistStorage.writes.count = 0
+            window.Alpine.$data(el).count = 6
+        })
+
+        get('span').should(haveText('6'))
+        get('#component').should(() => {
+            expect(window.persistStorage.writes.count).to.equal(0)
+        })
     },
 )

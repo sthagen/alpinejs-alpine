@@ -1,6 +1,6 @@
 {
     "name": "@alpinejs/csp",
-    "version": "3.16.1",
+    "version": "3.17.1",
     "description": "A CSP-friendly build of AlpineJS",
     "repository": {
         "type": "git",
@@ -12,6 +12,6 @@
     "main": "dist/module.cjs.js",
     "module": "dist/module.esm.js",
     "dependencies": {
-        "@vue/reactivity": "~3.1.1"
+        "@vue/reactivity": "~3.5.40"
     }
 }
